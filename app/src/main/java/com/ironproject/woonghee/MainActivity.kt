@@ -119,7 +119,7 @@ class MainActivity : ComponentActivity() {
             return
         }
         if (status == HealthConnectClient.SDK_UNAVAILABLE_PROVIDER_UPDATE_REQUIRED) {
-            val provider = HealthConnectClient.DEFAULT_PROVIDER_PACKAGE_NAME
+            val provider = "com.google.android.apps.healthdata"
             val uri = Uri.parse("market://details?id=$provider&url=healthconnect%3A%2F%2Fonboarding")
             startActivity(Intent(Intent.ACTION_VIEW, uri).apply {
                 setPackage("com.android.vending")
