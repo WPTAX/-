@@ -1,0 +1,258 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>아이언 프로젝트_이웅희</title>
+<style>
+:root{font-family:system-ui,-apple-system,"Samsung One","Noto Sans KR",sans-serif}
+*{box-sizing:border-box}
+body{margin:0;background:#f5f6f7;color:#111}
+.wrap{max-width:760px;margin:0 auto;padding:18px 14px 48px}
+header{padding:14px 4px 16px}
+h1{margin:0 0 5px;font-size:25px;letter-spacing:-.5px}
+.sub{font-size:12px;color:#6b6f76}
+.card{background:#fff;border-radius:19px;padding:16px;margin-bottom:14px;box-shadow:0 2px 12px rgba(0,0,0,.055)}
+h2{margin:0 0 14px;font-size:17px}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.stat{background:#f3f4f5;border-radius:14px;padding:13px;text-align:center;font-size:12px;color:#676b72}
+.stat b{display:block;margin-top:4px;color:#111;font-size:22px}
+button{border:0;border-radius:12px;padding:11px 14px;font-weight:750;font-size:14px;cursor:pointer}
+.primary{background:#111;color:#fff}.secondary{background:#eceef0;color:#111}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.status{margin-top:10px;font-size:12px;line-height:1.5;color:#656a71}
+.good{color:#16784a}.warn{color:#a06600}
+.bar{height:14px;background:#e4e6e8;border-radius:999px;overflow:hidden;margin-top:12px}
+.bar>div{height:100%;width:0;background:#111}
+.small{font-size:12px;color:#777;margin-top:6px}
+label{font-size:12px;color:#666;display:block;margin-bottom:5px}
+input,select{width:100%;border:1px solid #dcdfe2;border-radius:11px;padding:11px;font-size:16px;background:#fff}
+.sleepGrid{display:grid;grid-template-columns:1.3fr 1fr;gap:10px}
+.tabs{display:flex;gap:7px;overflow:auto;margin-bottom:9px}
+.tab{background:#eef0f2;white-space:nowrap}.tab.on{background:#111;color:#fff}
+.period{display:flex;gap:7px;margin-bottom:12px}
+.period button{flex:1}
+.chart{height:245px;position:relative}
+canvas{width:100%;height:100%}
+.legend{font-size:12px;color:#777;margin-top:7px}
+.scroll{overflow:auto}
+table{border-collapse:collapse;width:100%;min-width:590px;font-size:12px}
+th,td{padding:9px 6px;text-align:center;border-bottom:1px solid #eee}
+th{color:#70747a;font-weight:650}
+.pill{display:inline-block;padding:6px 9px;border-radius:999px;background:#f0f1f2;font-size:11px;color:#555}
+.footer{font-size:11px;color:#7b7f84;line-height:1.55}
+@media(max-width:500px){.wrap{padding:12px 12px 40px}.stats{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+<h1>아이언 프로젝트_이웅희</h1>
+<div class="sub">Samsung Health 러닝 기록 · 주 160분 · 수면 수기 기록</div>
+</header>
+
+<section class="card">
+<h2>삼성헬스 연결</h2>
+<div class="row">
+<button class="primary" onclick="connectHealth()">연결 / 권한 허용</button>
+<button class="secondary" onclick="syncHealth()">기록 새로고침</button>
+</div>
+<div id="healthStatus" class="status">앱을 처음 실행하면 Health Connect 읽기 권한을 허용해 주세요.</div>
+<div class="small">데이터 출처: Samsung Health → Health Connect</div>
+</section>
+
+<section class="card">
+<h2>이번 주</h2>
+<div class="stats">
+<div class="stat">총 러닝 시간<b id="weekMinutes">0분</b></div>
+<div class="stat">총 거리<b id="weekDistance">0.0km</b></div>
+<div class="stat">평균 심박<b id="weekHr">-</b></div>
+<div class="stat">러닝 횟수<b id="weekRuns">0회</b></div>
+</div>
+<div class="bar"><div id="goalBar"></div></div>
+<div id="goalText" class="small">주 160분 목표</div>
+</section>
+
+<section class="card">
+<h2>수면시간 입력</h2>
+<div class="sleepGrid">
+<div><label>날짜</label><input id="sleepDate" type="date"></div>
+<div><label>수면시간</label><input id="sleepHours" type="number" min="0" max="24" step="0.1" placeholder="7.5"></div>
+</div>
+<div class="row" style="margin-top:11px"><button class="primary" onclick="saveSleep()">저장</button></div>
+<div id="sleepSaved" class="small"></div>
+</section>
+
+<section class="card">
+<h2>주간 · 월간 그래프</h2>
+<div class="period">
+<button id="weeklyBtn" class="tab on" onclick="setPeriod('weekly')">주간</button>
+<button id="monthlyBtn" class="tab" onclick="setPeriod('monthly')">월간</button>
+</div>
+<div class="tabs">
+<button class="tab on metric" data-metric="minutes" onclick="setMetric('minutes',this)">러닝 시간</button>
+<button class="tab metric" data-metric="distance" onclick="setMetric('distance',this)">거리</button>
+<button class="tab metric" data-metric="hr" onclick="setMetric('hr',this)">평균 심박</button>
+<button class="tab metric" data-metric="sleep" onclick="setMetric('sleep',this)">수면</button>
+</div>
+<div class="chart"><canvas id="chart"></canvas></div>
+<div id="chartLegend" class="legend"></div>
+</section>
+
+<section class="card">
+<h2>최근 러닝</h2>
+<div class="scroll"><table>
+<thead><tr><th>날짜</th><th>시간</th><th>거리</th><th>평균심박</th></tr></thead>
+<tbody id="runsTable"></tbody>
+</table></div>
+</section>
+
+<section class="card footer">
+<span class="pill">개인용</span> <span class="pill">기기 내 수면기록 저장</span>
+<p>러닝 데이터는 Health Connect에서 읽어 표시하며 앱 자체가 건강 데이터를 외부 서버로 전송하지 않도록 구성했습니다. 수면시간은 이 앱의 기기 저장소에만 기록됩니다.</p>
+</section>
+</div>
+
+<script>
+const SLEEP_KEY='iron_sleep_v1';
+let runs=[];
+let period='weekly';
+let metric='minutes';
+const $=x=>document.getElementById(x);
+
+function today(){return new Date().toISOString().slice(0,10)}
+$('sleepDate').value=today();
+
+function nativeReady(){return !!(window.AndroidIron)}
+function connectHealth(){
+ if(nativeReady()) AndroidIron.requestHealthPermissions();
+ else setStatus('Android 앱에서 실행해야 Health Connect를 사용할 수 있습니다.','warn');
+}
+function syncHealth(){
+ if(nativeReady()) AndroidIron.syncRunningData();
+ else setStatus('Android 앱에서 실행해야 Health Connect를 사용할 수 있습니다.','warn');
+}
+function setStatus(t,cls=''){
+ const e=$('healthStatus'); e.textContent=t; e.className='status '+cls;
+}
+window.onHealthStatus=function(status,message){
+ if(status==='connected') setStatus(message||'Health Connect 연결됨','good');
+ else if(status==='syncing') setStatus(message||'삼성헬스 기록을 불러오는 중...');
+ else setStatus(message||status,'warn');
+}
+window.receiveHealthData=function(jsonText){
+ try{
+  runs=JSON.parse(jsonText)||[];
+  localStorage.setItem('iron_cached_runs_v1',JSON.stringify(runs));
+  setStatus(`동기화 완료 · 러닝 ${runs.length}건`,'good');
+  renderAll();
+ }catch(e){setStatus('러닝 기록을 표시하지 못했습니다.','warn')}
+}
+try{runs=JSON.parse(localStorage.getItem('iron_cached_runs_v1')||'[]')}catch(e){runs=[]}
+
+function getSleeps(){try{return JSON.parse(localStorage.getItem(SLEEP_KEY)||'{}')}catch(e){return {}}}
+function saveSleep(){
+ let d=$('sleepDate').value,h=+$('sleepHours').value;
+ if(!d||!h||h<=0||h>24){$('sleepSaved').textContent='날짜와 수면시간을 확인해 주세요.';return}
+ let s=getSleeps();s[d]=h;localStorage.setItem(SLEEP_KEY,JSON.stringify(s));
+ $('sleepSaved').textContent=`${d} · ${h.toFixed(1)}시간 저장`;
+ renderAll();
+}
+function mondayOf(date){
+ let d=new Date(date), day=(d.getDay()+6)%7;d.setHours(0,0,0,0);d.setDate(d.getDate()-day);return d;
+}
+function keyWeek(dateString){
+ let m=mondayOf(new Date(dateString+'T12:00:00'));
+ return `${m.getFullYear()}-${String(m.getMonth()+1).padStart(2,'0')}-${String(m.getDate()).padStart(2,'0')}`;
+}
+function keyMonth(dateString){return dateString.slice(0,7)}
+function currentWeekRuns(){
+ let k=keyWeek(today());return runs.filter(r=>keyWeek(r.date)===k)
+}
+function weightedHr(arr){
+ let valid=arr.filter(x=>x.avgHr>0&&x.minutes>0);
+ if(!valid.length)return 0;
+ let num=valid.reduce((a,x)=>a+x.avgHr*x.minutes,0),den=valid.reduce((a,x)=>a+x.minutes,0);
+ return num/den;
+}
+function renderSummary(){
+ let a=currentWeekRuns();
+ let mins=a.reduce((s,x)=>s+x.minutes,0), dist=a.reduce((s,x)=>s+x.distanceKm,0), hr=weightedHr(a);
+ $('weekMinutes').textContent=Math.round(mins)+'분';
+ $('weekDistance').textContent=dist.toFixed(2)+'km';
+ $('weekHr').textContent=hr?Math.round(hr)+' bpm':'-';
+ $('weekRuns').textContent=a.length+'회';
+ let p=Math.round(mins/160*100);$('goalBar').style.width=Math.min(100,p)+'%';
+ $('goalText').textContent=`주 160분 목표 · ${p}% · ${Math.max(0,Math.round(160-mins))}분 남음`;
+}
+function renderTable(){
+ let tb=$('runsTable');tb.innerHTML='';
+ let a=[...runs].sort((x,y)=>y.startEpoch-x.startEpoch).slice(0,30);
+ if(!a.length){tb.innerHTML='<tr><td colspan="4">삼성헬스에서 러닝 기록을 불러오면 표시됩니다.</td></tr>';return}
+ a.forEach(r=>{
+  let tr=document.createElement('tr');
+  tr.innerHTML=`<td>${r.date.slice(5)}</td><td>${Math.round(r.minutes)}분</td><td>${r.distanceKm.toFixed(2)}km</td><td>${r.avgHr?Math.round(r.avgHr):'-'}</td>`;
+  tb.appendChild(tr);
+ })
+}
+function aggregate(){
+ let grouped={};
+ runs.forEach(r=>{
+  let k=period==='weekly'?keyWeek(r.date):keyMonth(r.date);
+  if(!grouped[k])grouped[k]={minutes:0,distance:0,hrNum:0,hrDen:0,sleepVals:[]};
+  grouped[k].minutes+=r.minutes;grouped[k].distance+=r.distanceKm;
+  if(r.avgHr>0){grouped[k].hrNum+=r.avgHr*r.minutes;grouped[k].hrDen+=r.minutes}
+ });
+ let sleeps=getSleeps();
+ Object.entries(sleeps).forEach(([d,h])=>{
+  let k=period==='weekly'?keyWeek(d):keyMonth(d);
+  if(!grouped[k])grouped[k]={minutes:0,distance:0,hrNum:0,hrDen:0,sleepVals:[]};
+  grouped[k].sleepVals.push(+h);
+ });
+ return Object.keys(grouped).sort().map(k=>{
+  let g=grouped[k];
+  return {key:k,minutes:g.minutes,distance:g.distance,hr:g.hrDen?g.hrNum/g.hrDen:0,
+          sleep:g.sleepVals.length?g.sleepVals.reduce((a,b)=>a+b,0)/g.sleepVals.length:0}
+ }).slice(period==='weekly'?-16:-12);
+}
+function setPeriod(p){
+ period=p;$('weeklyBtn').classList.toggle('on',p==='weekly');$('monthlyBtn').classList.toggle('on',p==='monthly');drawChart();
+}
+function setMetric(m,btn){
+ metric=m;document.querySelectorAll('.metric').forEach(x=>x.classList.remove('on'));btn.classList.add('on');drawChart();
+}
+function drawChart(){
+ let data=aggregate(),canvas=$('chart'),ctx=canvas.getContext('2d'),rect=canvas.getBoundingClientRect(),ratio=window.devicePixelRatio||1;
+ canvas.width=Math.round(rect.width*ratio);canvas.height=Math.round(rect.height*ratio);ctx.setTransform(ratio,0,0,ratio,0,0);
+ let W=rect.width,H=rect.height,p={l:45,r:10,t:14,b:37};ctx.clearRect(0,0,W,H);
+ let vals=data.map(x=>x[metric]).filter(v=>v>0);
+ let max=vals.length?Math.max(...vals):1,min=0;
+ if(metric==='hr'&&vals.length){min=Math.floor((Math.min(...vals)-10)/10)*10;max=Math.ceil((Math.max(...vals)+10)/10)*10}
+ if(metric==='sleep'){max=Math.max(10,Math.ceil(max));}
+ ctx.font='11px system-ui';ctx.strokeStyle='#e5e7e9';ctx.fillStyle='#777';ctx.lineWidth=1;
+ for(let i=0;i<5;i++){
+  let y=p.t+(H-p.t-p.b)*i/4;ctx.beginPath();ctx.moveTo(p.l,y);ctx.lineTo(W-p.r,y);ctx.stroke();
+  let v=max-(max-min)*i/4;ctx.fillText(metric==='distance'||metric==='sleep'?v.toFixed(1):Math.round(v),3,y+4)
+ }
+ if(!data.length){ctx.fillText('기록이 쌓이면 그래프가 표시됩니다.',p.l+15,H/2);$('chartLegend').textContent='';return}
+ let gap=(W-p.l-p.r)/Math.max(1,data.length),bw=Math.min(30,gap*.58);
+ ctx.fillStyle='#111';
+ data.forEach((d,i)=>{
+   let v=d[metric],x=p.l+gap*i+gap/2,y=p.t+(H-p.t-p.b)*(max-v)/(max-min||1),base=H-p.b;
+   if(v>0)ctx.fillRect(x-bw/2,y,bw,Math.max(2,base-y));
+   if(data.length<=8||i%Math.ceil(data.length/6)===0||i===data.length-1){
+     ctx.fillStyle='#777';
+     let lab=period==='weekly'?d.key.slice(5).replace('-','/') : d.key.slice(2).replace('-','/');
+     ctx.fillText(lab,x-15,H-12);ctx.fillStyle='#111';
+   }
+ });
+ let unit={minutes:'분',distance:'km',hr:'bpm',sleep:'시간'}[metric];
+ $('chartLegend').textContent=`${period==='weekly'?'주간':'월간'} ${document.querySelector('.metric.on').textContent} · 단위 ${unit}`;
+}
+function renderAll(){renderSummary();renderTable();drawChart()}
+window.addEventListener('resize',drawChart);
+renderAll();
+setTimeout(()=>{if(nativeReady()) AndroidIron.autoSyncIfPermitted()},300);
+</script>
+</body>
+</html>

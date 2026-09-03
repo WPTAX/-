@@ -1,0 +1,6 @@
+1. GitHub 새 저장소 생성
+2. ZIP 내부 파일을 전부 업로드
+3. Actions → Build APK → Run workflow
+4. 빌드 완료 → Artifacts의 '아이언-프로젝트-이웅희-APK' 다운로드
+5. app-debug.apk 갤럭시에 설치
+6. 앱 실행 → 연결/권한 허용 → 기록 새로고침
