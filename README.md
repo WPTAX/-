@@ -12,10 +12,10 @@
 - 초록+파랑 중심의 밝은 UI, 도트 캐릭터는 홈 상단에만 사용
 
 ## 설치 호환성 변경
-- compileSdk 35
+- compileSdk 36
 - targetSdk 35
 - Android Gradle Plugin 8.7.3
-- Gradle 8.9
+- Gradle 8.11.1
 - 별도 package: com.ironproject.woonghee.v42
 
 ## GitHub에서 APK 만들기
