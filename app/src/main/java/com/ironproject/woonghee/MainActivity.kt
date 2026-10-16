@@ -15,7 +15,7 @@ import androidx.health.connect.client.permission.HealthPermission
 import androidx.health.connect.client.records.DistanceRecord
 import androidx.health.connect.client.records.ExerciseSessionRecord
 import androidx.health.connect.client.records.HeartRateRecord
-import androidx.health.connect.client.records.metadata.DataOrigin
+import androidx.health.connect.client.records.SleepSessionRecord
 import androidx.health.connect.client.request.AggregateRequest
 import androidx.health.connect.client.request.ReadRecordsRequest
 import androidx.health.connect.client.time.TimeRangeFilter
@@ -31,6 +31,8 @@ import java.time.ZonedDateTime
 class MainActivity : ComponentActivity() {
 
     companion object {
+        private const val HEALTH_CONNECT_PROVIDER = "com.google.android.apps.healthdata"
+        private const val GARMIN_CONNECT = "com.garmin.android.apps.connectmobile"
         private const val SAMSUNG_HEALTH = "com.sec.android.app.shealth"
     }
 
@@ -40,8 +42,8 @@ class MainActivity : ComponentActivity() {
     private val permissionLauncher =
         registerForActivityResult(PermissionController.createRequestPermissionResultContract()) {
             lifecycleScope.launch {
-                sendStatus("connected", "권한 설정이 완료되었습니다. 삼성헬스 기록을 확인합니다.")
-                syncRunningDataInternal()
+                sendStatus("connected", "권한 설정이 완료되었습니다. 기록을 불러옵니다.")
+                syncAllInternal()
             }
         }
 
@@ -60,8 +62,7 @@ class MainActivity : ComponentActivity() {
         }
         setContentView(webView)
 
-        val status = HealthConnectClient.getSdkStatus(this)
-        if (status == HealthConnectClient.SDK_AVAILABLE) {
+        if (HealthConnectClient.getSdkStatus(this) == HealthConnectClient.SDK_AVAILABLE) {
             client = HealthConnectClient.getOrCreate(this)
         }
     }
@@ -74,22 +75,15 @@ class MainActivity : ComponentActivity() {
 
         @JavascriptInterface
         fun syncRunningData() {
-            lifecycleScope.launch { syncRunningDataInternal() }
+            lifecycleScope.launch { syncAllInternal() }
         }
 
         @JavascriptInterface
         fun autoSyncIfPermitted() {
             lifecycleScope.launch {
-                val c = client
-                if (c == null) {
-                    sendStatus("error", healthConnectUnavailableMessage())
-                    return@launch
-                }
-                val needed = basicPermissions()
+                val c = client ?: return@launch
                 val granted = c.permissionController.getGrantedPermissions()
-                if (granted.containsAll(needed)) {
-                    syncRunningDataInternal()
-                }
+                if (granted.containsAll(basicPermissions())) syncAllInternal()
             }
         }
     }
@@ -97,7 +91,8 @@ class MainActivity : ComponentActivity() {
     private fun basicPermissions(): Set<String> = setOf(
         HealthPermission.getReadPermission(ExerciseSessionRecord::class),
         HealthPermission.getReadPermission(DistanceRecord::class),
-        HealthPermission.getReadPermission(HeartRateRecord::class)
+        HealthPermission.getReadPermission(HeartRateRecord::class),
+        HealthPermission.getReadPermission(SleepSessionRecord::class)
     )
 
     private fun requestedPermissions(): Set<String> {
@@ -119,8 +114,7 @@ class MainActivity : ComponentActivity() {
             return
         }
         if (status == HealthConnectClient.SDK_UNAVAILABLE_PROVIDER_UPDATE_REQUIRED) {
-            val provider = "com.google.android.apps.healthdata"
-            val uri = Uri.parse("market://details?id=$provider&url=healthconnect%3A%2F%2Fonboarding")
+            val uri = Uri.parse("market://details?id=$HEALTH_CONNECT_PROVIDER&url=healthconnect%3A%2F%2Fonboarding")
             startActivity(Intent(Intent.ACTION_VIEW, uri).apply {
                 setPackage("com.android.vending")
                 putExtra("overlay", true)
@@ -140,7 +134,13 @@ class MainActivity : ComponentActivity() {
         else "Health Connect를 사용할 수 없습니다."
     }
 
-    private suspend fun syncRunningDataInternal() {
+    private fun sourceLabel(packageName: String): String = when (packageName) {
+        GARMIN_CONNECT -> "Garmin Connect"
+        SAMSUNG_HEALTH -> "Samsung Health"
+        else -> packageName.substringAfterLast('.').ifBlank { "Health Connect" }
+    }
+
+    private suspend fun syncAllInternal() {
         val c = client
         if (c == null) {
             sendStatus("error", healthConnectUnavailableMessage())
@@ -149,71 +149,77 @@ class MainActivity : ComponentActivity() {
 
         val granted = c.permissionController.getGrantedPermissions()
         if (!granted.containsAll(basicPermissions())) {
-            sendStatus("error", "먼저 '연결 / 권한 허용'을 눌러 운동·거리·심박 읽기 권한을 허용해 주세요.")
+            sendStatus("error", "먼저 Health Connect 읽기 권한을 허용해 주세요.")
             return
         }
 
-        sendStatus("syncing", "Samsung Health 러닝 기록을 불러오는 중…")
+        sendStatus("syncing", "Garmin/Health Connect 기록을 불러오는 중…")
 
         try {
-            // Prefer 6 months. If historical permission is unavailable/not granted, Health Connect
-            // will expose the allowed range; retry 30 days on a read restriction.
-            val sixMonthsAgo = ZonedDateTime.now().minusMonths(6).toInstant()
             val now = Instant.now()
-            val sessions = try {
-                readSamsungRuns(c, sixMonthsAgo, now)
-            } catch (e: Exception) {
-                readSamsungRuns(c, now.minus(Duration.ofDays(30)), now)
-            }
+            val start = ZonedDateTime.now().minusMonths(6).toInstant()
+            val runs = try { readRuns(c, start, now) }
+            catch (_: Exception) { readRuns(c, now.minus(Duration.ofDays(30)), now) }
 
-            val array = JSONArray()
-            for (session in sessions.sortedBy { it.startTime }) {
-                val sourceFilter = setOf(DataOrigin(SAMSUNG_HEALTH))
+            val runArray = JSONArray()
+            for (session in runs.sortedBy { it.startTime }) {
+                val origin = session.metadata.dataOrigin
                 val agg = c.aggregate(
                     AggregateRequest(
-                        metrics = setOf(
-                            DistanceRecord.DISTANCE_TOTAL,
-                            HeartRateRecord.BPM_AVG
-                        ),
+                        metrics = setOf(DistanceRecord.DISTANCE_TOTAL, HeartRateRecord.BPM_AVG),
                         timeRangeFilter = TimeRangeFilter.between(session.startTime, session.endTime),
-                        dataOriginFilter = sourceFilter
+                        dataOriginFilter = setOf(origin)
                     )
                 )
-
                 val minutes = Duration.between(session.startTime, session.endTime).seconds / 60.0
                 val km = agg[DistanceRecord.DISTANCE_TOTAL]?.inKilometers ?: 0.0
                 val hr = agg[HeartRateRecord.BPM_AVG]?.toDouble() ?: 0.0
                 val localDate = session.startTime.atZone(ZoneId.systemDefault()).toLocalDate().toString()
-
-                array.put(JSONObject().apply {
+                runArray.put(JSONObject().apply {
                     put("date", localDate)
                     put("startEpoch", session.startTime.toEpochMilli())
                     put("minutes", minutes)
                     put("distanceKm", km)
                     put("avgHr", hr)
-                    put("source", "Samsung Health")
+                    put("source", sourceLabel(origin.packageName))
+                    put("sourcePackage", origin.packageName)
                 })
             }
 
-            val quoted = JSONObject.quote(array.toString())
-            runOnUiThread {
-                webView.evaluateJavascript("window.receiveHealthData($quoted);", null)
+            val sleeps = try { readSleep(c, start, now) }
+            catch (_: Exception) { readSleep(c, now.minus(Duration.ofDays(30)), now) }
+            val sleepArray = JSONArray()
+            for (s in sleeps.sortedBy { it.startTime }) {
+                val mins = Duration.between(s.startTime, s.endTime).seconds / 60.0
+                val date = s.endTime.atZone(ZoneId.systemDefault()).toLocalDate().toString()
+                val pkg = s.metadata.dataOrigin.packageName
+                sleepArray.put(JSONObject().apply {
+                    put("date", date)
+                    put("minutes", mins)
+                    put("hours", mins / 60.0)
+                    put("startEpoch", s.startTime.toEpochMilli())
+                    put("source", sourceLabel(pkg))
+                    put("sourcePackage", pkg)
+                })
             }
+
+            val runsQuoted = JSONObject.quote(runArray.toString())
+            val sleepQuoted = JSONObject.quote(sleepArray.toString())
+            runOnUiThread {
+                webView.evaluateJavascript("window.receiveHealthData($runsQuoted);", null)
+                webView.evaluateJavascript("window.receiveSleepData($sleepQuoted);", null)
+            }
+            sendStatus("connected", "동기화 완료 · Garmin Connect는 Health Connect를 통해 반영됩니다.")
         } catch (e: Exception) {
             sendStatus("error", "동기화 중 오류: ${e.message ?: "알 수 없는 오류"}")
         }
     }
 
-    private suspend fun readSamsungRuns(
-        c: HealthConnectClient,
-        start: Instant,
-        end: Instant
-    ): List<ExerciseSessionRecord> {
+    private suspend fun readRuns(c: HealthConnectClient, start: Instant, end: Instant): List<ExerciseSessionRecord> {
         val response = c.readRecords(
             ReadRecordsRequest(
                 recordType = ExerciseSessionRecord::class,
                 timeRangeFilter = TimeRangeFilter.between(start, end),
-                dataOriginFilter = setOf(DataOrigin(SAMSUNG_HEALTH)),
                 pageSize = 1000
             )
         )
@@ -223,11 +229,19 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    private suspend fun readSleep(c: HealthConnectClient, start: Instant, end: Instant): List<SleepSessionRecord> {
+        return c.readRecords(
+            ReadRecordsRequest(
+                recordType = SleepSessionRecord::class,
+                timeRangeFilter = TimeRangeFilter.between(start, end),
+                pageSize = 1000
+            )
+        ).records
+    }
+
     private fun sendStatus(status: String, message: String) {
         val s = JSONObject.quote(status)
         val m = JSONObject.quote(message)
-        runOnUiThread {
-            webView.evaluateJavascript("window.onHealthStatus($s,$m);", null)
-        }
+        runOnUiThread { webView.evaluateJavascript("window.onHealthStatus($s,$m);", null) }
     }
 }
