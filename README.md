@@ -1,26 +1,25 @@
-# 아이언 프로젝트 v4 — Garmin/Health Connect
+# 아이언 프로젝트_이웅희 v4.2
 
-## 핵심 변경
-- Garmin Connect → Health Connect 경유 자동 러닝 불러오기
-- 삼성헬스에 고정되지 않고 Health Connect의 러닝 세션을 모두 읽음
-- 동일 운동이 여러 앱에서 겹치면 앱 화면에서 중복을 최대한 제거
-- 주간 목표시간(기본 160분) / 완료시간 / 남은시간 / 달성률
-- 누락 러닝 수기 입력 및 삭제
-- Health Connect 수면 자동 읽기 + 수면 수기 입력(수기가 우선)
-- 주간 러닝 바 차트, 최근 기록, 평균 심박/거리/횟수
-- 초록 + 파랑 UI, 도트 캐릭터는 헤더에만 사용
+설치 호환성을 위해 예전에 정상 설치되었던 환경에 맞춘 버전입니다.
 
-## Garmin 설정
-Garmin Connect 앱에서 Health Connect 공유를 켠 뒤, 아이언 프로젝트에서 Health Connect 권한을 허용합니다.
-앱은 Garmin API에 직접 로그인하지 않고 Health Connect를 통해 데이터를 읽습니다.
+## 주요 기능
+- Garmin Connect → Health Connect를 통한 러닝 자동 읽기
+- 러닝 시간/거리/평균 심박 자동 표시
+- 주간 목표 기본 160분, 완료/남은 시간 자동 계산
+- 누락된 러닝 기록 직접 입력 및 삭제
+- 수면시간 Health Connect 자동 연동 또는 직접 입력
+- 주간 러닝 시간/거리/평균 심박/횟수 표시
+- 초록+파랑 중심의 밝은 UI, 도트 캐릭터는 홈 상단에만 사용
 
-## APK 빌드
-GitHub에 이 프로젝트 전체를 업로드한 뒤 Actions > Build APK > Run workflow.
-빌드 산출물: `아이언-프로젝트-이웅희-APK` artifact.
+## 설치 호환성 변경
+- compileSdk 35
+- targetSdk 35
+- Android Gradle Plugin 8.7.3
+- Gradle 8.9
+- 별도 package: com.ironproject.woonghee.v42
 
-## 참고
-현재 채팅 실행환경에는 Android SDK/Gradle이 설치되어 있지 않아 APK 자체를 로컬 빌드하지 못하고, GitHub Actions 빌드 설정을 포함한 소스 프로젝트를 제공합니다.
-
-
-## v4.1 install fix
-- applicationId changed to `com.ironproject.woonghee.v4` to avoid conflicts with prior debug-signing installs.
+## GitHub에서 APK 만들기
+1. 이 ZIP의 내용 전체를 저장소에 업로드하고 Commit합니다.
+2. Actions → Build APK → Run workflow를 실행합니다.
+3. 빌드가 초록 체크로 끝나면 Summary 맨 아래 Artifacts에서 `iron-project-v4.2-apk`를 받습니다.
+4. 압축을 풀어 `app-debug.apk`를 휴대폰에 설치합니다.

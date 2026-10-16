@@ -5,14 +5,14 @@ plugins {
 
 android {
     namespace 'com.ironproject.woonghee'
-    compileSdk 36
+    compileSdk 35
 
     defaultConfig {
-        applicationId "com.ironproject.woonghee.v4"
+        applicationId "com.ironproject.woonghee.v42"
         minSdk 28
-        targetSdk 36
-        versionCode 41
-        versionName "4.1-installfix"
+        targetSdk 35
+        versionCode 42
+        versionName "4.2-compatible"
     }
 
     compileOptions {

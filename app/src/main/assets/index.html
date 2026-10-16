@@ -13,7 +13,7 @@
 *{box-sizing:border-box} body{margin:0;background:linear-gradient(180deg,#eef9ff 0,#f7fbff 30%,#f5faf7 100%);color:var(--navy)}
 .app{max-width:720px;margin:auto;min-height:100vh;padding-bottom:88px}.page{display:none;padding:18px 14px 28px}.page.on{display:block}
 .hero{position:relative;min-height:150px;padding:20px 18px 12px;overflow:hidden}.hero:after{content:"";position:absolute;inset:auto -50px -50px 30%;height:150px;background:radial-gradient(circle,#d9f5e4 0,#eaf6ff 45%,transparent 70%)}
-.hero h1{position:relative;z-index:2;margin:0;font-size:34px;letter-spacing:-1.5px}.hero h1 b{color:var(--blue)}.hero p{position:relative;z-index:2;margin:6px 0;color:#60738a;font-size:15px}
+.compactHero{min-height:105px;padding-bottom:0}.hero h1{position:relative;z-index:2;margin:0;font-size:34px;letter-spacing:-1.5px}.hero h1 b{color:var(--blue)}.hero p{position:relative;z-index:2;margin:6px 0;color:#60738a;font-size:15px}
 .character{position:absolute;z-index:3;right:18px;bottom:0;width:112px;height:112px;object-fit:contain;border-radius:24px;filter:drop-shadow(0 8px 10px rgba(0,0,0,.08))}
 .card{background:rgba(255,255,255,.96);border:1px solid rgba(210,230,241,.95);border-radius:24px;padding:18px;margin-bottom:14px;box-shadow:var(--shadow)}
 .row{display:flex;align-items:center;gap:10px}.between{justify-content:space-between}.title{font-size:18px;font-weight:800;letter-spacing:-.4px}.muted{color:var(--muted);font-size:12px}.big{font-size:31px;font-weight:900;letter-spacing:-1px}.green{color:var(--green)}.blue{color:var(--blue)}
@@ -56,7 +56,7 @@ input,select{width:100%;padding:12px;border:1px solid #d9e4eb;border-radius:12px
   </section>
 
   <section id="records" class="page">
-    <div class="hero"><h1><b>러닝</b> 기록</h1><p>달린 만큼 쌓이는 변화 🌱</p><img src="character.png" class="character" alt="도트 캐릭터"></div>
+    <div class="hero compactHero"><h1><b>러닝</b> 기록</h1><p>달린 만큼 쌓이는 변화 🌱</p></div>
     <div class="card"><div class="row between"><div class="title">이번 주 누적 <span class="green big" id="weekTotal">0분</span></div><button class="btn primary small" onclick="openRunModal()">+ 기록 추가</button></div><div class="grid4" style="margin-top:14px"><div class="metric"><span>러닝</span><b id="weekCount">0회</b></div><div class="metric"><span>총 거리</span><b id="weekDistance">0km</b></div><div class="metric"><span>평균 심박</span><b id="weekHr">-</b></div><div class="metric"><span>남은 목표</span><b id="weekRemainSmall">-</b></div></div></div>
     <div class="card"><div class="title">주간 러닝 추이</div><div id="weekBars" class="weekBars"></div></div>
     <div class="card"><div class="row between"><div class="title">최근 기록</div><span class="muted">수기 + 자동</span></div><div id="recordList"></div></div>
@@ -73,7 +73,7 @@ input,select{width:100%;padding:12px;border:1px solid #d9e4eb;border-radius:12px
   <section id="settings" class="page">
     <div class="hero"><h1><b>설정</b></h1><p>아이언 프로젝트 개인 설정</p><img src="character.png" class="character" alt="도트 캐릭터"></div>
     <div class="card"><div class="title">데이터 관리</div><div class="actions" style="margin-top:12px"><button class="btn secondary" onclick="syncHealth()">Health Connect 동기화</button><button class="btn light" onclick="exportData()">기록 백업 보기</button></div><p class="note">수기 입력값은 기기 내부에 저장됩니다. 자동 기록은 Health Connect에서 다시 불러올 수 있습니다.</p></div>
-    <div class="card"><div class="title">앱 정보</div><p class="note">아이언 프로젝트 v4 · Garmin Connect/Health Connect 지원 · 주간 목표·수면·수기 기록 기능 포함</p></div>
+    <div class="card"><div class="title">앱 정보</div><p class="note">아이언 프로젝트 v4.2 · Garmin Connect/Health Connect 지원 · 주간 목표·수면·수기 기록 기능 포함</p></div>
   </section>
 </div>
 
