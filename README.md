@@ -20,3 +20,7 @@ GitHub에 이 프로젝트 전체를 업로드한 뒤 Actions > Build APK > Run 
 
 ## 참고
 현재 채팅 실행환경에는 Android SDK/Gradle이 설치되어 있지 않아 APK 자체를 로컬 빌드하지 못하고, GitHub Actions 빌드 설정을 포함한 소스 프로젝트를 제공합니다.
+
+
+## v4.1 install fix
+- applicationId changed to `com.ironproject.woonghee.v4` to avoid conflicts with prior debug-signing installs.
