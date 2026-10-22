@@ -1,0 +1,229 @@
+{
+  "tags": [
+    {
+      "tag": "manifest",
+      "attributes": {
+        "versionCode": 42,
+        "versionName": "4.2-compatible",
+        "compileSdkVersion": 36,
+        "compileSdkVersionCodename": "16",
+        "package": "com.ironproject.woonghee.v42",
+        "platformBuildVersionCode": 36,
+        "platformBuildVersionName": 16
+      }
+    },
+    {
+      "tag": "uses-sdk",
+      "attributes": {
+        "minSdkVersion": 28,
+        "targetSdkVersion": 35
+      }
+    },
+    {
+      "tag": "uses-permission",
+      "attributes": {
+        "name": "android.permission.health.READ_EXERCISE"
+      }
+    },
+    {
+      "tag": "uses-permission",
+      "attributes": {
+        "name": "android.permission.health.READ_DISTANCE"
+      }
+    },
+    {
+      "tag": "uses-permission",
+      "attributes": {
+        "name": "android.permission.health.READ_HEART_RATE"
+      }
+    },
+    {
+      "tag": "uses-permission",
+      "attributes": {
+        "name": "android.permission.health.READ_SLEEP"
+      }
+    },
+    {
+      "tag": "uses-permission",
+      "attributes": {
+        "name": "android.permission.health.READ_HEALTH_DATA_HISTORY"
+      }
+    },
+    {
+      "tag": "queries",
+      "attributes": {}
+    },
+    {
+      "tag": "package",
+      "attributes": {
+        "name": "com.google.android.apps.healthdata"
+      }
+    },
+    {
+      "tag": "permission",
+      "attributes": {
+        "name": "com.ironproject.woonghee.v42.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION",
+        "protectionLevel": 2
+      }
+    },
+    {
+      "tag": "uses-permission",
+      "attributes": {
+        "name": "com.ironproject.woonghee.v42.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
+      }
+    },
+    {
+      "tag": "application",
+      "attributes": {
+        "theme": 2131361792,
+        "label": 2131296257,
+        "icon": 2131230720,
+        "debuggable": true,
+        "allowBackup": true,
+        "extractNativeLibs": false,
+        "appComponentFactory": "androidx.core.app.CoreComponentFactory"
+      }
+    },
+    {
+      "tag": "activity",
+      "attributes": {
+        "name": "com.ironproject.woonghee.PrivacyActivity",
+        "exported": true
+      }
+    },
+    {
+      "tag": "intent-filter",
+      "attributes": {}
+    },
+    {
+      "tag": "action",
+      "attributes": {
+        "name": "androidx.health.ACTION_SHOW_PERMISSIONS_RATIONALE"
+      }
+    },
+    {
+      "tag": "intent-filter",
+      "attributes": {}
+    },
+    {
+      "tag": "action",
+      "attributes": {
+        "name": "android.intent.action.VIEW_PERMISSION_USAGE"
+      }
+    },
+    {
+      "tag": "category",
+      "attributes": {
+        "name": "android.intent.category.HEALTH_PERMISSIONS"
+      }
+    },
+    {
+      "tag": "activity",
+      "attributes": {
+        "name": "com.ironproject.woonghee.MainActivity",
+        "exported": true,
+        "screenOrientation": 1
+      }
+    },
+    {
+      "tag": "intent-filter",
+      "attributes": {}
+    },
+    {
+      "tag": "action",
+      "attributes": {
+        "name": "android.intent.action.MAIN"
+      }
+    },
+    {
+      "tag": "category",
+      "attributes": {
+        "name": "android.intent.category.LAUNCHER"
+      }
+    },
+    {
+      "tag": "service",
+      "attributes": {
+        "name": "androidx.health.platform.client.impl.sdkservice.HealthDataSdkService",
+        "enabled": true,
+        "exported": true
+      }
+    },
+    {
+      "tag": "intent-filter",
+      "attributes": {}
+    },
+    {
+      "tag": "action",
+      "attributes": {
+        "name": "androidx.health.platform.client.ACTION_BIND_SDK_SERVICE"
+      }
+    },
+    {
+      "tag": "provider",
+      "attributes": {
+        "name": "androidx.startup.InitializationProvider",
+        "exported": false,
+        "authorities": "com.ironproject.woonghee.v42.androidx-startup"
+      }
+    },
+    {
+      "tag": "meta-data",
+      "attributes": {
+        "name": "androidx.profileinstaller.ProfileInstallerInitializer",
+        "value": "androidx.startup"
+      }
+    },
+    {
+      "tag": "receiver",
+      "attributes": {
+        "name": "androidx.profileinstaller.ProfileInstallReceiver",
+        "permission": "android.permission.DUMP",
+        "enabled": true,
+        "exported": true,
+        "directBootAware": false
+      }
+    },
+    {
+      "tag": "intent-filter",
+      "attributes": {}
+    },
+    {
+      "tag": "action",
+      "attributes": {
+        "name": "androidx.profileinstaller.action.INSTALL_PROFILE"
+      }
+    },
+    {
+      "tag": "intent-filter",
+      "attributes": {}
+    },
+    {
+      "tag": "action",
+      "attributes": {
+        "name": "androidx.profileinstaller.action.SKIP_FILE"
+      }
+    },
+    {
+      "tag": "intent-filter",
+      "attributes": {}
+    },
+    {
+      "tag": "action",
+      "attributes": {
+        "name": "androidx.profileinstaller.action.SAVE_PROFILE"
+      }
+    },
+    {
+      "tag": "intent-filter",
+      "attributes": {}
+    },
+    {
+      "tag": "action",
+      "attributes": {
+        "name": "androidx.profileinstaller.action.BENCHMARK_OPERATION"
+      }
+    }
+  ],
+  "nativeLibraries": []
+}
