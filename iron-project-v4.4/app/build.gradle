@@ -1,0 +1,55 @@
+plugins {
+    id 'com.android.application'
+    id 'org.jetbrains.kotlin.android'
+}
+
+android {
+    namespace 'com.ironproject.woonghee'
+    compileSdk 36
+
+    defaultConfig {
+        applicationId "com.ironproject.woonghee.v42"
+        minSdk 28
+        targetSdk 35
+        versionCode 44
+        versionName "4.4"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+    kotlinOptions { jvmTarget = '17' }
+
+    signingConfigs {
+        personal {
+            if (System.getenv('IRON_KEYSTORE_PATH')) {
+                storeFile file(System.getenv('IRON_KEYSTORE_PATH'))
+                storePassword System.getenv('IRON_STORE_PASSWORD')
+                keyAlias System.getenv('IRON_KEY_ALIAS')
+                keyPassword System.getenv('IRON_KEY_PASSWORD')
+            }
+            enableV1Signing true
+            enableV2Signing true
+        }
+    }
+    buildTypes {
+        debug { minifyEnabled false }
+        release {
+            minifyEnabled false
+            if (System.getenv('IRON_KEYSTORE_PATH')) signingConfig signingConfigs.personal
+        }
+    }
+}
+
+dependencies {
+    implementation "androidx.activity:activity-ktx:1.10.1"
+    implementation "androidx.core:core-ktx:1.16.0"
+    implementation "androidx.lifecycle:lifecycle-runtime-ktx:2.8.7"
+    implementation "androidx.health.connect:connect-client:1.1.0"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.9.0"
+    androidTestImplementation "androidx.test:runner:1.6.2"
+    androidTestImplementation "androidx.test.ext:junit:1.2.1"
+    androidTestImplementation "androidx.test:core-ktx:1.6.1"
+}

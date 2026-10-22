@@ -1,0 +1,33 @@
+✔ UI starts with 160-minute target and all required elements (5.2939ms)
+✔ Manual running saves, counts toward goal and survives reopening (4.4683ms)
+✔ Rendering escapes memo HTML (2.0995ms)
+✔ Negative distance and infinite duration cannot be saved (1.722ms)
+✔ Goal updates survive reopening and max is enforced (2.9963ms)
+✔ Manual sleep override saves and can be removed (2.1452ms)
+✔ Malformed sync response retains cached automatic records (2.0731ms)
+✔ Successful empty snapshot deletes automatic data only inside its window (1.9802ms)
+✔ Backup roundtrip restores manual runs and target (4.5683ms)
+✔ Malformed backup leaves original goal untouched (1.7651ms)
+✔ Seoul midnight uses local date, not UTC day (0.9892ms)
+✔ Monday boundary and year crossover (0.2315ms)
+✔ 160-minute goal and seconds remain exact (1.0301ms)
+✔ Goal overrun clamps remaining and progress (0.2038ms)
+✔ Heart rate weighted by duration excludes unavailable values (0.1929ms)
+✔ Manual runs with similar duration on the same date survive (0.2623ms)
+✔ Manual and automatic are not silently collapsed (0.2004ms)
+✔ Same-source separate sessions survive (0.3151ms)
+✔ Garmin wins over a matching cross-source copy (0.2323ms)
+✔ Snapshot replaces deleted/updated rows within range and preserves history (0.9451ms)
+✔ Invalid snapshot range fails without returning destructive replacement (0.2404ms)
+✔ Manual sleep overrides and deletion restores automatic value (0.3498ms)
+✔ Sleep naps aggregate once and overlapping duplicate intervals do not add (0.1935ms)
+✔ Validation rejects NaN, infinity, impossible and future-shaped dates (0.1502ms)
+✔ Untrusted memo escaped before HTML insertion (0.2125ms)
+ℹ tests 25
+ℹ suites 0
+ℹ pass 25
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 129.3986

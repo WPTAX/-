@@ -1,0 +1,31 @@
+{
+  "sha256": "37a7cd69c9f03174903cc5b8774305dcef27638e9ec71b2dc81b3235153b7b14",
+  "bytes": 10882761,
+  "signingBlockStart": 10867399,
+  "blocks": [
+    "7109871a",
+    "42726577"
+  ],
+  "v2": [
+    {
+      "subject": "CN=Android Debug\nO=Android\nC=US",
+      "issuer": "CN=Android Debug\nO=Android\nC=US",
+      "validFrom": "Oct 16 02:30:45 2026 GMT",
+      "validTo": "Oct  8 02:30:45 2056 GMT",
+      "fingerprint256": "EA:6F:70:E7:50:C3:7B:C7:84:4E:53:B6:85:35:E7:13:20:F8:AA:AF:C8:2A:4E:57:09:91:9D:98:33:B8:4E:9A",
+      "publicKeyMatches": true,
+      "signatures": [
+        {
+          "algorithm": "103",
+          "valid": true
+        }
+      ],
+      "digests": [
+        {
+          "algorithm": "103",
+          "contentMatches": true
+        }
+      ]
+    }
+  ]
+}
